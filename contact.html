@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>联系 · 光影集</title>
+  <meta name="description" content="联系光影集 · LUMEN。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">光影集<span>LUMEN</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">首页</a>
+        <a href="work.html">作品</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html" class="active">联系</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero container">
+      <p class="hero-kicker">CONTACT</p>
+      <h1>联系我</h1>
+      <p class="hero-desc">合作、约拍或只是想聊聊摄影，欢迎留言。</p>
+    </section>
+
+    <section class="section container contact-body">
+      <div class="contact-info">
+        <h2>联系方式</h2>
+        <ul>
+          <li>邮箱：<a href="mailto:hello@example.com">hello@example.com</a></li>
+          <li>Instagram：<a href="#" rel="nofollow">@yourname</a></li>
+          <li>微博 / 小红书：<span>（待填写）</span></li>
+        </ul>
+        <p class="dim">注：以下均为占位信息，请将 contact.html 中的链接替换为你的真实联系方式。</p>
+      </div>
+
+      <div class="contact-form-wrap">
+        <h2>给我留言</h2>
+        <form class="contact-form" id="contactForm" action="#" method="post">
+          <label for="name">称呼</label>
+          <input type="text" id="name" name="name" required placeholder="你的称呼">
+          <label for="email">邮箱</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com">
+          <label for="message">留言</label>
+          <textarea id="message" name="message" rows="6" required placeholder="写下你想说的话…"></textarea>
+          <button class="btn" type="submit">发送</button>
+          <p class="form-msg" id="formMsg"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 光影集 · LUMEN — 个人摄影作品博客</p>
+      <p class="footer-links"><a href="index.html">首页</a> · <a href="about.html">关于</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

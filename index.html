@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>光影集 · LUMEN — 个人摄影作品集</title>
+  <meta name="description" content="光影集 · LUMEN，一个用于收集与展示摄影作品的个人博客网站。风光、城市、人文与静物，每一张照片都是一个故事。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">光影集<span>LUMEN</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html" class="active">首页</a>
+        <a href="work.html">作品</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="hero-kicker">LIGHT &amp; SHADOW</p>
+        <h1>光影集</h1>
+        <p class="hero-desc">用镜头收集世界的片刻。风光、城市、人文与静物——每一张照片都是一个故事。</p>
+        <a class="btn" href="work.html">浏览作品集</a>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="section-head">
+        <h2>精选作品</h2>
+        <p class="section-sub">Featured Works</p>
+      </div>
+      <div class="filters" id="galleryFilters">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="风光">风光</button>
+        <button class="filter-btn" data-filter="城市">城市</button>
+        <button class="filter-btn" data-filter="人文">人文</button>
+        <button class="filter-btn" data-filter="静物">静物</button>
+        <button class="filter-btn" data-filter="人像">人像</button>
+      </div>
+      <div class="gallery" id="gallery"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 光影集 · LUMEN — 个人摄影作品博客</p>
+      <p class="footer-links"><a href="about.html">关于</a> · <a href="contact.html">联系</a></p>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
