@@ -76,7 +76,7 @@
 
     function renderGallery() {
       var html = '';
-      var list = remoteWorks.concat(WORKS);
+      var list = remoteWorks;
       list.forEach(function (w) {
         if (activeFilter !== 'all' && w.category !== activeFilter) return;
         html +=
@@ -109,7 +109,7 @@
   var detail = document.getElementById('detail');
   if (detail) {
     function allWorks() {
-      return remoteWorks.concat(WORKS);
+      return remoteWorks;
     }
 
     function findById(list, rawId) {

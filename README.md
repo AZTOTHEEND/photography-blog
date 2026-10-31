@@ -24,27 +24,29 @@ output/
 ├── css/
 │   └── style.css         # 全局样式（深色简约主题，响应式适配手机）
 ├── js/
-│   ├── data.js           # ★ 作品数据源：标题、拍摄信息、图片路径都在这里
-│   └── main.js           # 交互脚本：导航、画廊渲染、详情渲染、表单提示
+│   ├── data.js           # 本地作品数据（已清空，仅保留结构与注释）
+│   ├── config.js         # Supabase 配置（URL / anon key 占位）
+│   ├── main.js           # 交互脚本：导航、画廊渲染、详情渲染、表单提示
+│   ├── upload.js         # 上传页脚本：图片上传 + 作品记录写入
+│   └── manage.js         # 管理页脚本：登录与审核
 ├── images/
 │   ├── README.txt        # 图片目录使用说明
-│   ├── placeholder/      # 8 张 SVG 占位图（可直接删除）
-│   └── photos/           # ★ 把你的摄影作品放这里（当前为空，.gitkeep 占位）
+│   └── photos/           # ★ 真实摄影作品存放目录（当前为空，.gitkeep 占位）
+└── upload.html           # 上传作品页
+└── manage.html           # 管理审核页
 └── README.md             # 本文件
 ```
 
-## 如何替换为自己的摄影作品
+## 作品数据来源
 
-1. **放入照片**：将你的照片复制到 `images/photos/` 目录。建议宽边 **1600px**，格式 **JPEG 或 WebP**，单张不超过 1MB（网页加载更快）。
-2. **修改数据**：打开 `js/data.js`，找到对应作品，把 `image` 字段改为你的照片路径，例如：
-   ```js
-   image: "images/photos/海边日落.jpg"
-   ```
-3. **更新信息**：同步修改 `title`（标题）、`titleEn`（英文标题）、`category`（分类：风光/城市/人文/静物/人像）、`date`、`location`、`description` 以及 `camera`/`lens`/`focal`/`aperture`/`shutter`/`iso` 等拍摄参数。
-4. **新增作品**：在 `WORKS` 数组末尾追加一个对象，`id` 使用新的数字（不要与现有 id 重复），画廊和详情页会自动生效。
-5. **清理占位图**：全部替换完成后，可删除 `images/placeholder/` 目录下的 SVG 文件。
+本站**只展示真实上传并通过审核的作品**，不包含任何示例占位内容：
 
-> 分类筛选按钮在首页 `index.html` 中定义，若你使用新的分类名，需同步添加/修改按钮的 `data-filter` 值。
+- 示例占位图（`images/placeholder/`）已删除
+- 本地演示数据（`js/data.js` 的 `WORKS` 数组）已清空，页面不再引用该文件
+- 画廊与详情页只从 Supabase 读取 `status = 'approved'` 的作品；`js/config.js` 未配置时，画廊显示「暂无作品」提示，不再回退显示示例图
+- 真实摄影作品存放于 `images/photos/` 目录（图片本体随上传自动进入 Supabase Storage，该目录用于本地静态展示场景）
+
+> 如确需在本地添加演示作品，可在 `js/data.js` 的 `WORKS` 数组手动追加对象（`id` 不要重复），并恢复 `js/main.js` 中 `remoteWorks.concat(WORKS)` 的回退逻辑；默认情况下无需改动这两个文件。
 
 ## 如何部署上线
 
@@ -84,7 +86,7 @@ output/
 本站已接入 Supabase，实现「手机用户上传图片 → 站主审核 → 审核通过后展示」的完整流程：
 
 - 游客在「上传作品」页（`upload.html`）选择照片、填写标题/分类/拍摄信息，图片上传到 Supabase Storage（bucket: `photos`），作品记录写入数据库表 `photos`（`status` 默认 `pending`）
-- 首页画廊只读取 `status = 'approved'` 的作品；`js/config.js` 未配置时自动回退展示本地 `js/data.js` 中的演示作品
+- 首页画廊只读取 `status = 'approved'` 的作品；`js/config.js` 未配置时画廊显示「暂无作品」，不再回退展示本地示例数据
 - 站主打开 `manage.html`（首页页脚有低调「管理」入口）登录后审核：一键通过 / 删除
 
 ### 1. 创建 Supabase 项目
@@ -151,7 +153,7 @@ create policy "允许登录用户管理照片" on storage.objects
 
 1. 项目 **Settings → API**，复制 **Project URL** 与 **anon public key**
 2. 填入 `js/config.js` 中 `SUPABASE_URL` 与 `SUPABASE_ANON_KEY` 两个占位常量并保存
-3. 重新打开网站即可生效；未配置时画廊回退展示本地演示作品，上传/管理页会提示先配置
+3. 重新打开网站即可生效；未配置时画廊显示「暂无作品」，上传/管理页会提示先配置
 
 ### 5. 创建站主账号
 
