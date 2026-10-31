@@ -21,6 +21,53 @@
     });
   }
 
+  /* ---------- Supabase 工具 ---------- */
+  var remoteWorks = [];
+
+  function supabaseReady() {
+    return typeof window.supabase !== 'undefined' && window.supabase &&
+      typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined' &&
+      SUPABASE_URL && SUPABASE_ANON_KEY;
+  }
+
+  function makeClient() {
+    if (!supabaseReady()) return null;
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  function normalizeRemote(w) {
+    return {
+      id: 'remote-' + w.id,
+      title: w.title || '未命名作品',
+      titleEn: w.category || '',
+      category: w.category || '未分类',
+      date: w.date || (w.created_at ? w.created_at.slice(0, 10) : ''),
+      location: w.location || '',
+      camera: w.camera || '',
+      lens: w.lens || '',
+      focal: w.focal || '',
+      aperture: w.aperture || '',
+      shutter: w.shutter || '',
+      iso: w.iso || '',
+      description: w.description || '',
+      image: w.image_url || ''
+    };
+  }
+
+  function loadRemoteWorks(cb) {
+    var client = makeClient();
+    if (!client) { if (cb) cb([]); return; }
+    client.from('photos').select('*').eq('status', 'approved').order('created_at', { ascending: false }).limit(300)
+      .then(function (res) {
+        remoteWorks = (res.data || []).map(normalizeRemote);
+        if (cb) cb(remoteWorks);
+      })
+      .catch(function () {
+        remoteWorks = [];
+        if (cb) cb(remoteWorks);
+      });
+  }
+
   /* ---------- 首页画廊 ---------- */
   var gallery = document.getElementById('gallery');
   if (gallery) {
@@ -29,20 +76,21 @@
 
     function renderGallery() {
       var html = '';
-      WORKS.forEach(function (w) {
+      var list = remoteWorks.concat(WORKS);
+      list.forEach(function (w) {
         if (activeFilter !== 'all' && w.category !== activeFilter) return;
         html +=
-          '<a class="work-card" href="work.html#work-' + w.id + '">' +
+          '<a class="work-card" href="work.html#' + w.id + '">' +
           '  <figure class="work-card-figure">' +
           '    <img src="' + w.image + '" alt="' + w.title + '" loading="lazy">' +
           '  </figure>' +
           '  <div class="work-card-info">' +
           '    <h3>' + w.title + '</h3>' +
-          '    <p>' + w.titleEn + ' · ' + w.category + '</p>' +
+          '    <p>' + (w.titleEn || w.category) + ' · ' + w.category + '</p>' +
           '  </div>' +
           '</a>';
       });
-      gallery.innerHTML = html || '<p class="dim">该分类下暂无作品。</p>';
+      gallery.innerHTML = html || '<p class="dim">暂无作品。已上传并通过审核的作品会显示在这里。</p>';
     }
 
     filterButtons.forEach(function (btn) {
@@ -54,26 +102,40 @@
       });
     });
 
-    renderGallery();
+    loadRemoteWorks(function () { renderGallery(); });
   }
 
   /* ---------- 作品详情页 ---------- */
   var detail = document.getElementById('detail');
   if (detail) {
-    function findWork(id) {
-      for (var i = 0; i < WORKS.length; i++) {
-        if (WORKS[i].id === id) return WORKS[i];
+    function allWorks() {
+      return remoteWorks.concat(WORKS);
+    }
+
+    function findById(list, rawId) {
+      for (var i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(rawId)) return list[i];
       }
       return null;
     }
 
     function renderDetail() {
-      var raw = (location.hash || '').replace('#work-', '');
-      var id = parseInt(raw, 10);
-      var w = findWork(id) || WORKS[0];
-      var idx = WORKS.indexOf(w);
-      var prev = WORKS[(idx - 1 + WORKS.length) % WORKS.length];
-      var next = WORKS[(idx + 1) % WORKS.length];
+      var list = allWorks();
+      if (!list.length) {
+        detail.innerHTML = '<p class="dim">暂无作品。</p>';
+        return;
+      }
+      var rawId = (location.hash || '').replace('#', '') || list[0].id;
+      if (rawId.indexOf('work-') === 0) rawId = rawId.slice(5);
+      var w = findById(list, rawId) || list[0];
+      var idx = list.indexOf(w);
+      var prev = list[(idx - 1 + list.length) % list.length];
+      var next = list[(idx + 1) % list.length];
+
+      var dimLine = [];
+      if (w.date) dimLine.push('拍摄日期：' + w.date);
+      if (w.location) dimLine.push('地点：' + w.location);
+      dimLine = dimLine.join('　');
 
       detail.innerHTML =
         '<figure class="detail-figure">' +
@@ -82,22 +144,22 @@
         '<div class="detail-body">' +
         '  <div>' +
         '    <h1>' + w.title + '</h1>' +
-        '    <p class="detail-en">' + w.titleEn + ' · ' + w.category + '</p>' +
-        '    <p class="detail-desc">' + w.description + '</p>' +
-        '    <p class="dim">拍摄日期：' + w.date + '　地点：' + w.location + '</p>' +
+        '    <p class="detail-en">' + (w.titleEn || w.category) + ' · ' + w.category + '</p>' +
+        '    <p class="detail-desc">' + (w.description || '') + '</p>' +
+        (dimLine ? '    <p class="dim">' + dimLine + '</p>' : '') +
         '  </div>' +
         '  <table class="exif-table">' +
-        '    <tr><th>相机</th><td>' + w.camera + '</td></tr>' +
-        '    <tr><th>镜头</th><td>' + w.lens + '</td></tr>' +
-        '    <tr><th>焦距</th><td>' + w.focal + '</td></tr>' +
-        '    <tr><th>光圈</th><td>' + w.aperture + '</td></tr>' +
-        '    <tr><th>快门</th><td>' + w.shutter + '</td></tr>' +
-        '    <tr><th>ISO</th><td>' + w.iso + '</td></tr>' +
+        '    <tr><th>相机</th><td>' + (w.camera || '—') + '</td></tr>' +
+        '    <tr><th>镜头</th><td>' + (w.lens || '—') + '</td></tr>' +
+        '    <tr><th>焦距</th><td>' + (w.focal || '—') + '</td></tr>' +
+        '    <tr><th>光圈</th><td>' + (w.aperture || '—') + '</td></tr>' +
+        '    <tr><th>快门</th><td>' + (w.shutter || '—') + '</td></tr>' +
+        '    <tr><th>ISO</th><td>' + (w.iso || '—') + '</td></tr>' +
         '  </table>' +
         '</div>' +
         '<div class="detail-nav">' +
-        '  <a href="work.html#work-' + prev.id + '">← 上一张 · ' + prev.title + '</a>' +
-        '  <a class="next" href="work.html#work-' + next.id + '">下一张 · ' + next.title + ' →</a>' +
+        '  <a href="work.html#' + prev.id + '">← 上一张 · ' + prev.title + '</a>' +
+        '  <a class="next" href="work.html#' + next.id + '">下一张 · ' + next.title + ' →</a>' +
         '</div>';
 
       document.title = w.title + ' · 光影集 · LUMEN';
@@ -105,7 +167,7 @@
     }
 
     window.addEventListener('hashchange', renderDetail);
-    renderDetail();
+    loadRemoteWorks(function () { renderDetail(); });
   }
 
   /* ---------- 联系表单（静态演示） ---------- */

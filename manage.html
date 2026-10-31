@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理 · 光影集</title>
+  <meta name="description" content="光影集 · LUMEN 作品审核管理后台。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">光影集<span>LUMEN</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">首页</a>
+        <a href="work.html">作品</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+        <a href="upload.html" class="nav-upload">上传作品</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero container">
+      <p class="hero-kicker">ADMIN</p>
+      <h1>作品管理</h1>
+      <p class="hero-desc">登录后可审核待处理作品：一键通过或删除。此页入口在首页页脚「管理」，请勿公开传播。</p>
+    </section>
+
+    <section class="section container">
+      <!-- 登录区 -->
+      <div class="login-card" id="loginCard">
+        <h2>站主登录</h2>
+        <form class="contact-form" id="loginForm">
+          <label for="loginEmail">邮箱</label>
+          <input type="email" id="loginEmail" required placeholder="admin@example.com">
+          <label for="loginPassword">密码</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••">
+          <button class="btn" type="submit">登录</button>
+          <p class="form-msg" id="loginMsg"></p>
+        </form>
+        <p class="dim">账号请在 Supabase 控制台 Authentication → Users 中创建。</p>
+      </div>
+
+      <!-- 管理区 -->
+      <div class="manage-panel" id="adminPanel" style="display:none;">
+        <div class="manage-toolbar">
+          <h2>待审核作品</h2>
+          <button class="btn btn-small" id="logoutBtn" type="button">退出登录</button>
+        </div>
+        <div class="manage-list" id="pendingList"></div>
+
+        <div class="section-head" style="margin-top:34px;">
+          <h2>全部作品</h2>
+          <p class="section-sub">All Works</p>
+        </div>
+        <div class="manage-list" id="allList"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 光影集 · LUMEN — 个人摄影作品博客</p>
+      <p class="footer-links"><a href="index.html">首页</a> · <a href="about.html">关于</a> · <a href="contact.html">联系</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/manage.js"></script>
+</body>
+</html>

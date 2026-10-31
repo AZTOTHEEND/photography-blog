@@ -76,4 +76,95 @@ output/
 - **配色**：修改 `css/style.css` 顶部的 `:root` 变量（`--bg`、`--accent` 等）即可全局换肤。
 - **留言表单**：`contact.html` 中的表单为静态演示。可前往 [formspree.io](https://formspree.io) 免费注册，把 `form.action` 改为 Formspree 提供的地址，并在 `js/main.js` 中调整提交提示文案，即可真实接收留言。
 - **联系方式**：把 `contact.html` 中的占位邮箱与社交链接替换为你的真实信息。
+
+---
+
+## 用户上传功能（Supabase 免费档）
+
+本站已接入 Supabase，实现「手机用户上传图片 → 站主审核 → 审核通过后展示」的完整流程：
+
+- 游客在「上传作品」页（`upload.html`）选择照片、填写标题/分类/拍摄信息，图片上传到 Supabase Storage（bucket: `photos`），作品记录写入数据库表 `photos`（`status` 默认 `pending`）
+- 首页画廊只读取 `status = 'approved'` 的作品；`js/config.js` 未配置时自动回退展示本地 `js/data.js` 中的演示作品
+- 站主打开 `manage.html`（首页页脚有低调「管理」入口）登录后审核：一键通过 / 删除
+
+### 1. 创建 Supabase 项目
+
+1. 打开 https://supabase.com → Sign up → New project（选 **Free** 免费档，无需信用卡）
+2. 创建成功后进入项目控制台，左侧 **Database → SQL Editor**
+
+### 2. 建表 SQL
+
+在 SQL Editor 中执行：
+
+```sql
+create table if not exists public.photos (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  category text default '其他',
+  description text,
+  date text,
+  location text,
+  camera text,
+  lens text,
+  focal text,
+  aperture text,
+  shutter text,
+  iso text,
+  image_url text not null,
+  status text not null default 'pending',
+  created_at timestamptz not null default now()
+);
+
+alter table public.photos enable row level security;
+
+-- 匿名用户只能插入，且 status 必须是 pending（防止绕过审核）
+create policy "允许匿名上传（仅 pending）" on public.photos
+  for insert to anon with check (status = 'pending');
+
+-- 匿名用户只能浏览已通过的作品
+create policy "允许匿名浏览已通过作品" on public.photos
+  for select to anon using (status = 'approved');
+
+-- 登录用户（站主）可管理全部记录
+create policy "站主可管理全部记录" on public.photos
+  for all to authenticated using (true) with check (true);
+```
+
+### 3. 创建 Storage bucket（photos）
+
+1. 左侧 **Storage → New bucket**，名称填 `photos`，勾选 **Public bucket**，点击 Create
+2. 在 SQL Editor 执行以下策略（匿名上传 + 登录用户管理）：
+
+```sql
+-- 允许匿名用户上传照片到 photos bucket
+create policy "允许匿名上传照片" on storage.objects
+  for insert to anon with check (bucket_id = 'photos');
+
+-- 允许登录用户（站主）管理 photos bucket 中的对象
+create policy "允许登录用户管理照片" on storage.objects
+  for all to authenticated using (bucket_id = 'photos') with check (bucket_id = 'photos');
+```
+
+> RLS 说明：匿名（anon key）权限被严格限制——只能插入 `pending` 记录、只能读取 `approved` 记录、只能上传不能删除；审核、删除、修改必须使用站主账号（authenticated）。`service_role` 密钥请勿放在前端。
+
+### 4. 配置 js/config.js
+
+1. 项目 **Settings → API**，复制 **Project URL** 与 **anon public key**
+2. 填入 `js/config.js` 中 `SUPABASE_URL` 与 `SUPABASE_ANON_KEY` 两个占位常量并保存
+3. 重新打开网站即可生效；未配置时画廊回退展示本地演示作品，上传/管理页会提示先配置
+
+### 5. 创建站主账号
+
+1. 项目 **Authentication → Users → Add user**，创建一个邮箱 + 密码账号（即管理登录账号）
+2. 打开网站的 `manage.html`，用该账号登录即可审核作品
+
+### 6. 上传与审核流程（游客视角）
+
+1. 手机打开网站 → 导航栏点「上传作品」
+2. 选择照片、填写标题/分类/拍摄信息 → 提交
+3. 图片上传至 Storage，记录写入 `photos` 表并进入 `pending` 状态
+4. 站主打开 `manage.html` 登录，在「待审核作品」中点击「通过」或「删除」
+5. 「通过」后作品即时出现在首页画廊（`status = approved`）
+
+> 免费档提示：Supabase Free 档有容量/带宽限额（默认 500MB 存储），建议上传前压缩图片（宽边 1600px 左右），并在 Storage 设置中按需配置缓存与图片压缩。
 *（内容由AI生成，仅供参考）*

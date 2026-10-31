@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上传作品 · 光影集</title>
+  <meta name="description" content="向光影集 · LUMEN 上传你的摄影作品，审核通过后将在画廊展示。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">光影集<span>LUMEN</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">首页</a>
+        <a href="work.html">作品</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+        <a href="upload.html" class="active nav-upload">上传作品</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero container">
+      <p class="hero-kicker">UPLOAD</p>
+      <h1>上传作品</h1>
+      <p class="hero-desc">选择照片并填写拍摄信息，提交后等待站主审核，通过后就会出现在画廊里。</p>
+    </section>
+
+    <section class="section container">
+      <div class="upload-form-wrap">
+        <form class="contact-form" id="uploadForm">
+          <label for="uploadFile">选择图片 *</label>
+          <input type="file" id="uploadFile" accept="image/*" required>
+          <div class="upload-preview" id="uploadPreview"></div>
+
+          <label for="uploadTitle">标题 *</label>
+          <input type="text" id="uploadTitle" required placeholder="例如：暮色海岸">
+
+          <label for="uploadCategory">分类 *</label>
+          <select id="uploadCategory">
+            <option value="风光">风光</option>
+            <option value="城市">城市</option>
+            <option value="人文">人文</option>
+            <option value="静物">静物</option>
+            <option value="人像">人像</option>
+            <option value="其他">其他</option>
+          </select>
+
+          <label for="uploadDate">拍摄日期</label>
+          <input type="date" id="uploadDate">
+
+          <label for="uploadLocation">拍摄地点</label>
+          <input type="text" id="uploadLocation" placeholder="例如：福建 · 霞浦">
+
+          <label for="uploadCamera">相机</label>
+          <input type="text" id="uploadCamera" placeholder="例如：Sony A7R IV">
+
+          <label for="uploadLens">镜头</label>
+          <input type="text" id="uploadLens" placeholder="例如：FE 24-70mm F2.8 GM">
+
+          <label for="uploadFocal">焦距</label>
+          <input type="text" id="uploadFocal" placeholder="例如：35mm">
+
+          <label for="uploadAperture">光圈</label>
+          <input type="text" id="uploadAperture" placeholder="例如：f/8">
+
+          <label for="uploadShutter">快门</label>
+          <input type="text" id="uploadShutter" placeholder="例如：1/60s">
+
+          <label for="uploadIso">ISO</label>
+          <input type="text" id="uploadIso" placeholder="例如：100">
+
+          <label for="uploadDesc">作品描述</label>
+          <textarea id="uploadDesc" rows="4" placeholder="简单讲讲这张照片的故事…"></textarea>
+
+          <button class="btn" type="submit">提交审核</button>
+          <p class="form-msg" id="uploadMsg"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 光影集 · LUMEN — 个人摄影作品博客</p>
+      <p class="footer-links"><a href="about.html">关于</a> · <a href="contact.html">联系</a> · <a href="manage.html" class="admin-link">管理</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/upload.js"></script>
+</body>
+</html>
