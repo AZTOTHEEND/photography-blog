@@ -301,3 +301,165 @@ ul { list-style: none; }
   .manage-item-actions { width: 100%; }
   .nav-upload { margin-top: 6px; text-align: center; }
 }
+
+/* ===== 互动动效层（Motion Layer） =====
+ * 原则：仅使用 transform / opacity 等可合成属性，避免布局抖动；
+ *       系统开启「减少动态效果」时统一降级为无动画。
+ */
+
+/* --- 通用关键帧 --- */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --- 7. 页面加载：首屏内容渐入（错峰） --- */
+.hero-kicker { animation: riseIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both; }
+.hero h1 { animation: riseIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
+.hero-desc { animation: riseIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.hero .btn { animation: riseIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both; }
+.page-hero h1 { animation: riseIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.page-hero .section-sub { animation: riseIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both; }
+.section-head { animation: riseIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+.site-footer > .container { animation: fadeIn 0.8s ease 0.2s both; }
+
+/* --- 3. 导航栏：滚动加深背景 + 轻微收缩 --- */
+.site-header { transition: background-color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; }
+.site-header.scrolled {
+  background-color: rgba(8, 8, 10, 0.97);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+}
+.nav-wrap { transform-origin: center; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.site-header.scrolled .nav-wrap { transform: scale(0.975); }
+.site-header .brand,
+.site-header .site-nav a { transition: color 0.2s ease, opacity 0.2s ease; }
+
+/* --- 1. 画廊卡片：滚动进入视口逐个渐入上浮（错峰延迟由 JS 注入） --- */
+.work-card {
+  position: relative;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease,
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+  will-change: opacity, transform;
+}
+.work-card.in-view { opacity: 1; transform: translateY(0); }
+
+/* --- 2. 卡片悬停：上浮加深阴影 + 图片放大 + 遮罩渐变信息 --- */
+.work-card:hover,
+.work-card:focus-visible {
+  transform: translateY(-7px);
+  border-color: rgba(214, 164, 110, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+}
+.work-card-figure { position: relative; }
+.work-card:hover .work-card-figure img,
+.work-card:focus-visible .work-card-figure img { transform: scale(1.06); }
+
+.work-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0) 78%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.work-card:hover .work-card-overlay,
+.work-card:focus-visible .work-card-overlay { opacity: 1; }
+.work-card-overlay-inner {
+  display: block;
+  padding: 16px;
+  transform: translateY(10px);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.work-card:hover .work-card-overlay-inner,
+.work-card:focus-visible .work-card-overlay-inner { transform: translateY(0); }
+.overlay-title { display: block; color: #fff; font-size: 1.02rem; font-weight: 600; letter-spacing: 0.5px; }
+.overlay-cat { display: block; color: rgba(255, 255, 255, 0.75); font-size: 0.78rem; letter-spacing: 2px; margin-top: 3px; }
+
+/* --- 6. 分类筛选：切换时重排过渡 --- */
+.gallery { transition: opacity 0.22s ease; }
+.gallery.is-filtering { opacity: 0; }
+
+/* --- 4. 作品详情：大图加载渐显 + 切换淡入淡出 --- */
+.detail { transition: opacity 0.24s ease, transform 0.24s ease; }
+.detail.is-switching { opacity: 0; transform: translateY(8px); }
+.detail-figure { animation: fadeIn 0.5s ease both; }
+.detail-figure img { opacity: 0; transition: opacity 0.6s ease; }
+.detail-figure img.is-loaded { opacity: 1; }
+.detail-body { animation: riseIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both; }
+.detail-nav { animation: fadeIn 0.5s ease 0.12s both; }
+
+/* --- 5. 按钮与表单控件：悬停/点击微交互 --- */
+.btn {
+  transition: background-color 0.25s ease, color 0.25s ease,
+              border-color 0.25s ease, box-shadow 0.25s ease,
+              transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(214, 164, 110, 0.22); }
+.btn:active { transform: translateY(0) scale(0.975); box-shadow: 0 4px 10px rgba(214, 164, 110, 0.16); }
+.filter-btn { transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.18s ease; }
+.filter-btn:hover { transform: translateY(-1px); }
+.filter-btn:active { transform: scale(0.95); }
+.manage-btn { transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.18s ease; }
+.manage-btn:active { transform: scale(0.96); }
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
+}
+.contact-form input:focus,
+.contact-form textarea:focus,
+.contact-form select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(214, 164, 110, 0.14);
+}
+.form-msg { transition: opacity 0.3s ease; }
+
+/* --- 8. 移动端：菜单展开/收起过渡（覆盖 820px 以下） --- */
+@media (max-width: 820px) {
+  .site-nav {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: max-height 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.28s ease,
+                transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .site-nav.open { opacity: 1; transform: translateY(0); }
+  .work-card:hover,
+  .work-card:focus-visible { transform: translateY(-3px); }
+  .work-card:hover .work-card-figure img { transform: scale(1.03); }
+  .btn:hover { transform: none; }
+}
+
+/* --- 8. 减少动态效果：统一降级为无动画 --- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+  .work-card { opacity: 1 !important; transform: none !important; }
+  .work-card.in-view { opacity: 1 !important; transform: none !important; }
+  .work-card:hover,
+  .work-card:focus-visible { transform: none !important; box-shadow: none !important; }
+  .work-card-overlay-inner { transform: none; }
+  .detail { opacity: 1 !important; transform: none !important; }
+  .detail-figure img { opacity: 1 !important; }
+  .gallery { opacity: 1 !important; }
+  .site-header.scrolled .nav-wrap { transform: none; }
+  .btn:hover { transform: none; box-shadow: none; }
+  .filter-btn:hover { transform: none; }
+}
